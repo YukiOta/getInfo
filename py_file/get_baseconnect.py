@@ -25,14 +25,10 @@ save_dir = "./out_base"
 def main():
     baseurl = "https://baseconnect.in"
 
-    category_url = "/companies/category/63b80d21-f5eb-43d1-8c1c-ed1bf3a15cb5"
-
     # user agent
     headers = {
         "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0",
     }
-
-    target_category = list(category_dict.keys())[index_start:index_end]
 
     # カテゴリの取得
     category_dict = {}
@@ -46,6 +42,8 @@ def main():
     for item in soup.find("div", "home__category--right").find_all("li"):
         category_dict[re.sub(r"・$", "", item.p.string)
                       ] = baseurl + item.a.get("href")
+
+    target_category = list(category_dict.keys())[index_start:index_end]
 
     #### 業界の選択 ####
     for key, category_url in category_dict.items():
@@ -87,6 +85,8 @@ def main():
                     # 会社名の抽出
                     basic_origin = {}
 
+                    if soup.find("h1", "node__header__text__title") is None:
+                        continue
                     company_name = soup.find(
                         "h1", "node__header__text__title").get_text().strip()
                     company_kana = soup.find(
