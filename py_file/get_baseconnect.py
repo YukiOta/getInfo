@@ -15,6 +15,8 @@ parser.add_argument("--start-index", type=int, default=0,
                     help="index of start (default: 0)")
 parser.add_argument("--start-end", type=int, default=416,
                     help="index of end (default: 416)")
+parser.add_argument("--keyword", type=str, default="",
+                    help="keyword for target genre (default: '')")
 args = parser.parse_args()
 index_start = args.start_index
 index_end = args.start_end
@@ -32,18 +34,32 @@ def main():
 
     # カテゴリの取得
     category_dict = {}
+    keyword_dict = {}
+    keyword = args.keyword
+
     res = requests.get("http://baseconnect.in/", headers=headers)
     soup = BeautifulSoup(res.content, "html.parser")
 
-    for item in soup.find("div", "home__category--left").find_all("li"):
-        category_dict[re.sub(r"・$", "", item.p.string)
-                      ] = baseurl + item.a.get("href")
+    if not keyword == "":
+        print("Getting : " + keyword)
+        for genre in soup.find_all(class_="node__box node__box--home home__category__box"):
+            if keyword in genre.h3.string:
+                for item in genre.find_all("li"):
+                    keyword_dict[re.sub(r"・$", "", item.p.string)
+                                 ] = baseurl + item.a.get("href")
+        category_dict = keyword_dict
+    else:
+        print("Getting : " + "ALL")
+        for item in soup.find("div", "home__category--left").find_all("li"):
+            category_dict[re.sub(r"・$", "", item.p.string)
+                          ] = baseurl + item.a.get("href")
 
-    for item in soup.find("div", "home__category--right").find_all("li"):
-        category_dict[re.sub(r"・$", "", item.p.string)
-                      ] = baseurl + item.a.get("href")
+        for item in soup.find("div", "home__category--right").find_all("li"):
+            category_dict[re.sub(r"・$", "", item.p.string)
+                          ] = baseurl + item.a.get("href")
 
     target_category = list(category_dict.keys())[index_start:index_end]
+    print("TARGET CATEGORY : " + target_category)
 
     #### 業界の選択 ####
     for key, category_url in category_dict.items():
@@ -201,6 +217,8 @@ def main():
                         df_all = pd.concat([df_all, df])
                     except NameError:
                         df_all = pd.io.json.json_normalize(basic_origin)
+                # 保存
+                df_all.to_csv(save_dir + "/" + key + "_" + str(page) + ".csv")
                 # ページの追加
                 page += 1
 
