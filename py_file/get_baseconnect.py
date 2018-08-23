@@ -33,7 +33,8 @@ def main():
 
     #### 業界の選択 ####
     for key, category_url in category_dict.items():
-        # if key == "電線・ケーブル業界の会社": # test
+        if not key == "スポーツウェアショップ業界の会社": # test
+            continue
         print(key)
         # 初期化
         page = 1
@@ -46,16 +47,20 @@ def main():
             # ページの読み込み
             res = requests.get(url, headers=headers)
             soup = BeautifulSoup(res.content, "html.parser")
+            time.sleep(3) # 遅延させる
+
+            # 企業ページリストの取得
+            lists = soup.find_all("div", "searches__result__list")
+            address= [test.find("a").get("href") for test in lists]
+            if len(address) == 0:
+                print("-------- no list. DONE.")
+                df_all.to_csv("./"+key+".csv")
+                break
 
             #### 業界のリスト ####
             if soup.find(class_="next_page disabled") is None or last_flag is True:
                 # ページ表示
                 print("--- Getting data at page = {} ---".format(page))
-                time.sleep(3) # 遅延させる
-
-                # 企業ページリストの取得
-                lists = soup.find_all("div", "searches__result__list")
-                address= [test.find("a").get("href") for test in lists]
 
                 for target in tqdm(address):
                     # print(target)
