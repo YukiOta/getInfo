@@ -8,6 +8,7 @@ from tqdm import tqdm
 import time
 import os
 
+save_dir = "./out_nico"
 
 def main():
     # 本番
@@ -52,7 +53,6 @@ def main():
 
 
 if __name__ == '__main__':
-    save_dir = "./out_nico"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     main()

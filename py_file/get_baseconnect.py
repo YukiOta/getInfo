@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 from collections import Counter
 
+save_dir = "./out_base"
 
 def main():
     baseurl = "https://baseconnect.in"
@@ -54,7 +55,7 @@ def main():
             address= [test.find("a").get("href") for test in lists]
             if len(address) == 0:
                 print("-------- no list. DONE.")
-                df_all.to_csv("./"+key+".csv")
+                df_all.to_csv(save_dir+"/"+key+".csv")
                 break
 
             #### 業界のリスト ####
@@ -177,7 +178,7 @@ def main():
                 page += 1
 
                 if last_flag:
-                    df_all.to_csv("./"+key+".csv")
+                    df_all.to_csv(save_dir+"/"+key+".csv")
                     print("--- DONE ---")
                     break
             else:
@@ -188,7 +189,6 @@ def main():
         
 
 if __name__ == '__main__':
-    save_dir = "./out_base"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     main()

@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 import os
 
+save_dir = "./out_med"
 
 def main():
     # ドメイン
@@ -100,7 +101,6 @@ def main():
 
 
 if __name__ == '__main__':
-    save_dir = "./out_med"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     main()
