@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 from collections import Counter
 import argparse
+import datetime
 
 parser = argparse.ArgumentParser(description='get_baseconnect')
 parser.add_argument("--start-index", type=int, default=0,
@@ -21,7 +22,12 @@ args = parser.parse_args()
 index_start = args.start_index
 index_end = args.start_end
 
-save_dir = "./out_base"
+save_dir = "./out_base/" + datetime.datetime.now().strftime('%Y%m%d%H%M')
+backup_dir = os.path.join(save_dir, "backup")
+
+
+def remove_space(str_in):
+    return re.sub(r"\s+", "", str_in)
 
 
 def main():
@@ -42,11 +48,13 @@ def main():
 
     if not keyword == "":
         print("Getting : " + keyword)
-        for genre in soup.find_all(class_="node__box node__box--home home__category__box"):
-            if keyword in genre.h3.string:
-                for item in genre.find_all("li"):
-                    keyword_dict[re.sub(r"・$", "", item.p.string)
-                                 ] = baseurl + item.a.get("href")
+        keyword_list = list(map(remove_space, keyword.split(",")))
+        for keyword_ in keyword_list:
+            for genre in soup.find_all(class_="node__box node__box--home home__category__box"):
+                if keyword_ in genre.h3.string:
+                    for item in genre.find_all("li"):
+                        keyword_dict[re.sub(r"・$", "", item.p.string)
+                                     ] = baseurl + item.a.get("href")
         category_dict = keyword_dict
     else:
         print("Getting : " + "ALL")
@@ -218,7 +226,8 @@ def main():
                     except NameError:
                         df_all = pd.io.json.json_normalize(basic_origin)
                 # 保存
-                df_all.to_csv(save_dir + "/" + key + "_" + str(page) + ".csv")
+                df_all.to_csv(backup_dir + "/" + key +
+                              "_" + str(page) + ".csv")
                 # ページの追加
                 page += 1
 
@@ -236,4 +245,6 @@ def main():
 if __name__ == '__main__':
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
+    if not os.path.exists(backup_dir):
+        os.makedirs(backup_dir)
     main()
