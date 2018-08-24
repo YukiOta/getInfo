@@ -67,7 +67,7 @@ def main():
                           ] = baseurl + item.a.get("href")
 
     target_category = list(category_dict.keys())[index_start:index_end]
-    print("TARGET CATEGORY : " + target_category)
+    print("TARGET CATEGORY : " + str(target_category))
 
     #### 業界の選択 ####
     for key, category_url in category_dict.items():
